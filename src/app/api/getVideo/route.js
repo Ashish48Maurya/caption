@@ -9,8 +9,8 @@ const client = new TranscribeClient({
     }
 });
 
-async function checkTranscriptionJobStatus(filename) {
-    const command = new GetTranscriptionJobCommand({ Transcriptionfilename: filename });
+async function checkTranscriptionJobStatus(jobName) {
+    const command = new GetTranscriptionJobCommand({ TranscriptionJobName: jobName });
     try {
         const data = await client.send(command);
         return data.TranscriptionJob;
@@ -22,14 +22,14 @@ async function checkTranscriptionJobStatus(filename) {
     }
 }
 
-async function startTranscriptionJob(filename) {
+async function startTranscriptionJob() {
     const command = new StartTranscriptionJobCommand({
-        Transcriptionfilename: filename,
+        TranscriptionJobName: jobName,
         OutputBucketName: process.env.BucketName,
-        OutputKey: `${filename}.transcription`,
+        OutputKey: `${jobName}.transcription`,
         IdentifyLanguage: true,
         Media: {
-            MediaFileUri: `s3://${process.env.BucketName}/${filename}`,
+            MediaFileUri: `s3://${process.env.BucketName}/videoplayback.mp4`,
         }
     });
     try {
@@ -48,6 +48,7 @@ async function getTranscript(transcriptUri) {
         }
         const transcript = await res.json();
         return transcript;
+        // return transcript.results.items;
     } catch (err) {
         throw new Error(`Failed to get transcript: ${err.message}`);
     }
@@ -57,7 +58,6 @@ export async function GET() {
     const url = new URL(req.url);
     const searchParams = new URLSearchParams(url.searchParams);
     const filename = searchParams.get('filename');
-
     try {
         let transcriptionJob = await checkTranscriptionJobStatus(filename);
 
