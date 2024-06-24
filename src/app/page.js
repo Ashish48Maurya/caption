@@ -36,7 +36,7 @@ export default function Home() {
     <input type="file" onChange={(e)=>{setFile(e.target.files[0])}}/>
     <button onClick={handleUpload}>Upload</button>
 
-    <button onClick={handlereq}>Transcript</button>
+    <button onClick={handleReq}>Transcript</button>
     </>
   );
 }
