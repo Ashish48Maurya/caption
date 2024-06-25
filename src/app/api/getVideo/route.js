@@ -22,14 +22,14 @@ async function checkTranscriptionJobStatus(jobName) {
     }
 }
 
-async function startTranscriptionJob() {
+async function startTranscriptionJob(jobName) {
     const command = new StartTranscriptionJobCommand({
         TranscriptionJobName: jobName,
         OutputBucketName: process.env.BucketName,
         OutputKey: `${jobName}.transcription`,
         IdentifyLanguage: true,
         Media: {
-            MediaFileUri: `s3://${process.env.BucketName}/videoplayback.mp4`,
+            MediaFileUri: `s3://${process.env.BucketName}/${jobName}`,
         }
     });
     try {
@@ -54,7 +54,7 @@ async function getTranscript(transcriptUri) {
     }
 }
 
-export async function GET() {
+export async function GET(req) {
     const url = new URL(req.url);
     const searchParams = new URLSearchParams(url.searchParams);
     const filename = searchParams.get('filename');
@@ -62,7 +62,7 @@ export async function GET() {
         let transcriptionJob = await checkTranscriptionJobStatus(filename);
 
         if (!transcriptionJob || transcriptionJob.TranscriptionJobStatus === 'FAILED') {
-            transcriptionJob = await startTranscriptionJob();
+            transcriptionJob = await startTranscriptionJob(filename);
         }
 
         while (transcriptionJob.TranscriptionJobStatus === 'IN_PROGRESS') {

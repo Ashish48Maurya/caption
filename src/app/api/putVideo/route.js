@@ -16,8 +16,6 @@ export async function POST(req) {
     if (!data) {
         return NextResponse.json({ success: false, message: "File Req" }, { status: 404 })
     }
-    // const name = file.name.split('.')[0]
-    // const ext = file.name.split('.')[1]
     const type = file.type
 
     const command = new PutObjectCommand({
