@@ -1,10 +1,9 @@
 "use client"
-import data from './data.json'
 import { useEffect, useRef, useState } from "react";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
-import roboto from './Roboto-Bold.ttf'
-import { Roboto } from 'next/font/google';
+import roboto from './Roboto-Regular.ttf';
+import robotoBold from './Roboto-Bold.ttf';
 
 export default function Home() {
   const [file, setFile] = useState(null);
@@ -26,7 +25,7 @@ export default function Home() {
   const load = async () => {
     const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.2/dist/umd'
     const ffmpeg = ffmpegRef.current;
-    
+
     console.log("Loading");
     await ffmpeg.load({
       coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
@@ -85,12 +84,13 @@ export default function Home() {
       console.log(message);
     });
     await ffmpeg.exec([
-      '-i',file?.name,
+      '-i', file?.name,
       '-preset', 'ultrafast',
-      '-vf', `subtitles=subs.srtforce_style='Fontname=Roboto,FontSize=20,MarginV=100'`,
+      '-vf', `subtitles=subs.srt:fontsdir=/tmp:force_style='Fontname=Roboto Bold,FontSize=30,MarginV=70,PrimaryColour=&H00FF0000'`,
       'output.mp4',
     ]);
     const data = await ffmpeg.readFile('output.mp4');
+    // console.log("VIDEO: ",URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' })));
     videoRef.current.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
   };
 
@@ -108,8 +108,6 @@ export default function Home() {
     }
     console.log("File Uploaded", data.message);
   };
-
-
 
   return (
     <>
